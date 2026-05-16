@@ -1,0 +1,832 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>SYRG Labs</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="SYRG Labs (Sinha-Yalageri Research Group) develops scientific computing methods across economics, physics, and biology to advance data-driven scientific discovery." />
+    <link rel="icon" type="image/png" href="logos/syrg-logo.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400..700;1,8..60,400..700&family=Cinzel:wght@500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+    <script src="data.js"></script>
+    <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" crossorigin="anonymous"></script>
+  </head>
+  <body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+      // ============================================================================
+      // SYRG Labs site app
+      // ----------------------------------------------------------------------------
+      // Single-file React app rendered from CDN. Hash-based SPA routing.
+      // Content lives in data.js. Styling lives in styles.css.
+      // ============================================================================
+
+      const { useState, useEffect, useRef } = React;
+
+      const NAV = [
+        ['home',     'Home'],
+        ['research', 'Research'],
+        ['models',   'Models & Data'],
+        ['partners', 'Partners'],
+        ['team',     'Team'],
+        ['news',     'News'],
+      ];
+
+      const TAG_LABELS = {
+        social:  "social science",
+        physics: "physics",
+        bio:     "biology",
+        reports: "reports",
+      };
+
+      // Normalize a paper's tag field to an array — accepts string or array.
+      const tagsOf = (p) => {
+        if (!p || !p.tag) return [];
+        return Array.isArray(p.tag) ? p.tag : [p.tag];
+      };
+
+      // Convert plain text to JSX, turning bare URLs into clickable links.
+      // Used by news bodies so editors can paste raw URLs and have them work.
+      const Linkify = ({ text }) => {
+        if (!text) return null;
+        const re = /https?:\/\/[^\s<>"]+/g;
+        const out = [];
+        let last = 0, m, i = 0;
+        while ((m = re.exec(text)) !== null) {
+          if (m.index > last) out.push(text.slice(last, m.index));
+          let url = m[0];
+          let trailing = '';
+          // Trim sentence punctuation that's likely not part of the URL
+          while (url.length && /[.,;:!?)\]}]/.test(url[url.length - 1])) {
+            trailing = url[url.length - 1] + trailing;
+            url = url.slice(0, -1);
+          }
+          out.push(<a key={'u' + (i++)} href={url} target="_blank" rel="noreferrer">{url}</a>);
+          if (trailing) out.push(trailing);
+          last = m.index + m[0].length;
+        }
+        if (last < text.length) out.push(text.slice(last));
+        return <>{out}</>;
+      };
+
+      // ── DATA ────────────────────────────────────────────────────────────────────
+      // All editable content lives in data.js — edit there to update the site.
+      const D = window.SYRG_DATA;
+      const PAPERS            = D.papers;
+      const SELECTED_IDS      = D.selected;
+      const LEADERSHIP        = D.leadership;
+      const TEAM              = D.team;
+      const RESEARCH_PARTNERS = D.researchPartners;
+      const ACADEMIC_COLLABS  = D.academicCollaborators;
+      const SPONSORS          = D.sponsors;
+      const NOTEBOOKS         = D.notebooks || [];
+      const NEWS              = D.news;
+      const CONTACT           = D.contact;
+      const HOME_AFFIL        = "Sinha-Yalageri Research Group";
+
+
+      // ── ICONS ───────────────────────────────────────────────────────────────────
+      // Inline SVG paths for the four social icons in the sidebar.
+      // Drop in any 24×24 viewBox single-path icon.
+      const ICONS = {
+        github:    "M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12",
+        linkedin:  "M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0z",
+        youtube:   "M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z",
+        instagram: "M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zM5.838 12a6.162 6.162 0 1 1 12.324 0 6.162 6.162 0 0 1-12.324 0zm6.162 4.162a4.162 4.162 0 1 1 0-8.324 4.162 4.162 0 0 1 0 8.324zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z",
+      };
+
+      const SocialIcon = ({ kind, href }) => (
+        <a href={href} target="_blank" rel="noreferrer" aria-label={kind} title={kind}>
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d={ICONS[kind.toLowerCase()]} /></svg>
+        </a>
+      );
+
+
+      // ── HERO ANIMATION ──────────────────────────────────────────────────────────
+      // Canonical PIML motif: scattered "measurements" (Dirichlet anchors)
+      // pinned to fixed values, the heat equation u_t = α∇²u diffusing around
+      // them so the continuous field interpolates between sparse data points.
+      // Anchors slowly rotate so the reconstruction always looks alive.
+      const HeroAnimation = () => {
+        const canvasRef = useRef(null);
+        useEffect(() => {
+          const canvas = canvasRef.current;
+          if (!canvas) return;
+          const ctx = canvas.getContext('2d');
+
+          const COLS = 120;              // wider grid for the full viewport
+          const ROWS = 60;
+          const ALPHA = 0.18;            // diffusion coefficient (stable < 0.25)
+          const ISO = [0.16, 0.34, 0.58];
+          const NUM_ANCHORS = 12;
+          const ANCHOR_LIFETIME = 540;
+          const HEATMAP_ALPHA = 32;      // very subtle so text reads on top
+
+          const N = COLS * ROWS;
+          let u = new Float32Array(N);
+          let unext = new Float32Array(N);
+          const idx = (i, j) => j * COLS + i;
+
+          // Each anchor pins one cell to a fixed value (Dirichlet boundary).
+          const newAnchor = () => ({
+            i: 4 + Math.floor(Math.random() * (COLS - 8)),
+            j: 3 + Math.floor(Math.random() * (ROWS - 6)),
+            value: 0.4 + Math.random() * 1.0,
+            age: 0,
+          });
+
+          let anchors = [];
+          for (let k = 0; k < NUM_ANCHORS; k++) anchors.push(newAnchor());
+
+          const enforceAnchors = () => {
+            for (const a of anchors) u[idx(a.i, a.j)] = a.value;
+          };
+
+          // Warm-start: enforce + diffuse a bunch of times so the field opens
+          // already populated rather than fading in from zero.
+          enforceAnchors();
+          for (let s = 0; s < 250; s++) {
+            for (let j = 0; j < ROWS; j++) {
+              for (let i = 0; i < COLS; i++) {
+                const c = u[idx(i, j)];
+                const l = i > 0        ? u[idx(i - 1, j)] : c;
+                const r = i < COLS - 1 ? u[idx(i + 1, j)] : c;
+                const t = j > 0        ? u[idx(i, j - 1)] : c;
+                const b = j < ROWS - 1 ? u[idx(i, j + 1)] : c;
+                unext[idx(i, j)] = c + ALPHA * (l + r + t + b - 4 * c);
+              }
+            }
+            const tmp = u; u = unext; unext = tmp;
+            enforceAnchors();
+          }
+
+          const step = () => {
+            for (let j = 0; j < ROWS; j++) {
+              for (let i = 0; i < COLS; i++) {
+                const c = u[idx(i, j)];
+                const l = i > 0        ? u[idx(i - 1, j)] : c;   // no-flux boundary
+                const r = i < COLS - 1 ? u[idx(i + 1, j)] : c;
+                const t = j > 0        ? u[idx(i, j - 1)] : c;
+                const b = j < ROWS - 1 ? u[idx(i, j + 1)] : c;
+                unext[idx(i, j)] = c + ALPHA * (l + r + t + b - 4 * c);
+              }
+            }
+            const tmp = u; u = unext; unext = tmp;
+            enforceAnchors();
+          };
+
+          const resize = () => {
+            const dpr = window.devicePixelRatio || 1;
+            canvas.width  = canvas.clientWidth  * dpr;
+            canvas.height = canvas.clientHeight * dpr;
+            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+          };
+          resize();
+          window.addEventListener('resize', resize);
+
+          // Offscreen canvas holds the field as a tiny image; we drawImage it
+          // upscaled onto the visible canvas so the browser handles smoothing.
+          const offscreen = document.createElement('canvas');
+          offscreen.width  = COLS;
+          offscreen.height = ROWS;
+          const offCtx = offscreen.getContext('2d');
+          const imgData = offCtx.createImageData(COLS, ROWS);
+
+          let frame = 0, raf;
+
+          const draw = () => {
+            const w = canvas.clientWidth;
+            const h = canvas.clientHeight;
+            const dx = w / (COLS - 1);
+            const dy = h / (ROWS - 1);
+
+            ctx.fillStyle = '#f6f3ec';
+            ctx.fillRect(0, 0, w, h);
+
+            step();
+
+            // Slowly rotate anchors: each frame age them, replace the oldest
+            // when it exceeds its lifetime so the reconstruction keeps moving.
+            for (const a of anchors) a.age++;
+            anchors.sort((a, b) => b.age - a.age);
+            if (anchors[0].age >= ANCHOR_LIFETIME) {
+              anchors[0] = newAnchor();
+            }
+
+            // Heatmap layer — soft ink-on-cream gradient via offscreen canvas
+            for (let i = 0; i < N; i++) {
+              const v = Math.min(1, Math.max(0, u[i]));
+              const k = i * 4;
+              imgData.data[k]     = 26;
+              imgData.data[k + 1] = 26;
+              imgData.data[k + 2] = 23;
+              imgData.data[k + 3] = v * HEATMAP_ALPHA;
+            }
+            offCtx.putImageData(imgData, 0, 0);
+            ctx.imageSmoothingEnabled = true;
+            ctx.imageSmoothingQuality = 'high';
+            ctx.drawImage(offscreen, 0, 0, w, h);
+
+            ctx.lineWidth = 1;
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+
+            // Marching squares per iso-value. 16 case lookup; saddles split.
+            for (let k = 0; k < ISO.length; k++) {
+              const iso = ISO[k];
+              ctx.lineWidth = 0.7;
+              ctx.strokeStyle = `rgba(26, 26, 23, ${0.10 + 0.18 * iso})`;
+              ctx.beginPath();
+              for (let j = 0; j < ROWS - 1; j++) {
+                for (let i = 0; i < COLS - 1; i++) {
+                  const v00 = u[idx(i, j)];
+                  const v10 = u[idx(i + 1, j)];
+                  const v11 = u[idx(i + 1, j + 1)];
+                  const v01 = u[idx(i, j + 1)];
+
+                  let c = 0;
+                  if (v00 > iso) c |= 1;
+                  if (v10 > iso) c |= 2;
+                  if (v11 > iso) c |= 4;
+                  if (v01 > iso) c |= 8;
+                  if (c === 0 || c === 15) continue;
+
+                  const x0 = i * dx;
+                  const y0 = j * dy;
+                  const x1 = x0 + dx;
+                  const y1 = y0 + dy;
+
+                  // Edge crossings (linear interpolation, guard against div by 0)
+                  const lerp = (a, b) => Math.abs(b - a) < 1e-9 ? 0.5 : (iso - a) / (b - a);
+                  const tx = x0 + dx * lerp(v00, v10);   // top edge
+                  const ry = y0 + dy * lerp(v10, v11);   // right edge
+                  const bx = x0 + dx * lerp(v01, v11);   // bottom edge
+                  const ly = y0 + dy * lerp(v00, v01);   // left edge
+
+                  switch (c) {
+                    case 1:  ctx.moveTo(tx, y0); ctx.lineTo(x0, ly); break;
+                    case 2:  ctx.moveTo(tx, y0); ctx.lineTo(x1, ry); break;
+                    case 3:  ctx.moveTo(x0, ly); ctx.lineTo(x1, ry); break;
+                    case 4:  ctx.moveTo(x1, ry); ctx.lineTo(bx, y1); break;
+                    case 5:  ctx.moveTo(tx, y0); ctx.lineTo(x0, ly);
+                             ctx.moveTo(x1, ry); ctx.lineTo(bx, y1); break;
+                    case 6:  ctx.moveTo(tx, y0); ctx.lineTo(bx, y1); break;
+                    case 7:  ctx.moveTo(x0, ly); ctx.lineTo(bx, y1); break;
+                    case 8:  ctx.moveTo(x0, ly); ctx.lineTo(bx, y1); break;
+                    case 9:  ctx.moveTo(tx, y0); ctx.lineTo(bx, y1); break;
+                    case 10: ctx.moveTo(tx, y0); ctx.lineTo(x1, ry);
+                             ctx.moveTo(x0, ly); ctx.lineTo(bx, y1); break;
+                    case 11: ctx.moveTo(x1, ry); ctx.lineTo(bx, y1); break;
+                    case 12: ctx.moveTo(x0, ly); ctx.lineTo(x1, ry); break;
+                    case 13: ctx.moveTo(tx, y0); ctx.lineTo(x1, ry); break;
+                    case 14: ctx.moveTo(tx, y0); ctx.lineTo(x0, ly); break;
+                  }
+                }
+              }
+              ctx.stroke();
+            }
+
+            // Anchors as small soft dots — the "data points" the field
+            // interpolates between. Kept subtle so text reads on top.
+            ctx.fillStyle = 'rgba(26, 26, 23, 0.32)';
+            for (const a of anchors) {
+              const cx = a.i * dx;
+              const cy = a.j * dy;
+              const r = 1.6 + Math.min(1, a.value) * 1.6;
+              ctx.beginPath();
+              ctx.arc(cx, cy, r, 0, Math.PI * 2);
+              ctx.fill();
+            }
+
+            frame++;
+            raf = requestAnimationFrame(draw);
+          };
+          draw();
+
+          return () => {
+            cancelAnimationFrame(raf);
+            window.removeEventListener('resize', resize);
+          };
+        }, []);
+        return (
+          <div className="hero-anim-wrap">
+            <canvas ref={canvasRef} className="hero-anim" aria-hidden="true" />
+            {/* PIML signature: physics term (heat equation) + learned correction */}
+            <div className="hero-anim-eqn" aria-hidden="true">
+              <span className="op">∂</span><sub>t</sub>u = α<span className="op">∇</span><sup>2</sup>u + ℒ<sub>θ</sub>(u)
+            </div>
+          </div>
+        );
+      };
+
+
+      // ── ISING FIELD ────────────────────────────────────────────────────────────
+      // Live 2D Ising model on the home page. Renders as a regular flow
+      // <canvas> inside <main>, so its CSS width is 100% of the main column
+      // — automatically the same width as the hero text above and the
+      // content on every other page. No fixed positioning, no measurement.
+      // Aspect ratio set in inline style to keep the figure wide-and-short.
+      // Cursor heat injection is bound to the canvas itself (offsetX/offsetY)
+      // so it only fires when the cursor is inside the figure.
+      const IsingField = () => {
+        const canvasRef = useRef(null);
+        useEffect(() => {
+          const canvas = canvasRef.current;
+          if (!canvas) return;
+          const ctx = canvas.getContext('2d');
+
+          const TARGET_CELL = 5.0;
+          const T_BG   = 2.27;
+          const T_HOT  = 4.0;
+          const HOT_R  = 70;
+          const STEPS_PER_FRAME = 4500;
+
+          let Nw = 0, Nh = 0;
+          let spins = new Int8Array(0);
+          const at    = (i, j)    => spins[((i + Nw) % Nw) * Nh + ((j + Nh) % Nh)];
+          const setAt = (i, j, v) => { spins[((i + Nw) % Nw) * Nh + ((j + Nh) % Nh)] = v; };
+
+          const reseedSpins = (newNw, newNh) => {
+            Nw = newNw; Nh = newNh;
+            spins = new Int8Array(Nw * Nh);
+            for (let k = 0; k < spins.length; k++) spins[k] = Math.random() < 0.5 ? 1 : -1;
+          };
+
+          let cellW = 0, cellH = 0;
+          let mouse = { x: -10000, y: -10000, active: false };
+          let raf;
+
+          const resize = () => {
+            const cssW = canvas.clientWidth;
+            const cssH = canvas.clientHeight;
+            const dpr  = window.devicePixelRatio || 1;
+            canvas.width  = cssW * dpr;
+            canvas.height = cssH * dpr;
+            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+            const newNw = Math.max(40, Math.floor(cssW / TARGET_CELL));
+            const newNh = Math.max(40, Math.floor(cssH / TARGET_CELL));
+            if (newNw !== Nw || newNh !== Nh) reseedSpins(newNw, newNh);
+            cellW = cssW / Nw;
+            cellH = cssH / Nh;
+          };
+          resize();
+          window.addEventListener('resize', resize);
+
+          // Mouse events bound to the canvas so heat only injects when the
+          // cursor is actually over the figure. offsetX/Y are canvas-local.
+          const onMove  = (e) => { mouse.x = e.offsetX; mouse.y = e.offsetY; mouse.active = true; };
+          const onLeave = () => { mouse.active = false; mouse.x = -10000; mouse.y = -10000; };
+          canvas.addEventListener('mousemove',  onMove);
+          canvas.addEventListener('mouseleave', onLeave);
+
+          const expBg = {
+            4: Math.exp(-4 / T_BG),
+            8: Math.exp(-8 / T_BG),
+          };
+
+          const stepMetropolis = (count) => {
+            for (let n = 0; n < count; n++) {
+              const i = (Math.random() * Nw) | 0;
+              const j = (Math.random() * Nh) | 0;
+              const s  = at(i, j);
+              const nb = at(i + 1, j) + at(i - 1, j) + at(i, j + 1) + at(i, j - 1);
+              const dE = 2 * s * nb;
+
+              let accept = false;
+              if (dE <= 0) {
+                accept = true;
+              } else {
+                let pAccept;
+                if (mouse.active) {
+                  const cx = (i + 0.5) * cellW;
+                  const cy = (j + 0.5) * cellH;
+                  const dx = cx - mouse.x;
+                  const dy = cy - mouse.y;
+                  const r2 = dx * dx + dy * dy;
+                  if (r2 < HOT_R * HOT_R) {
+                    const wgt = 1 - r2 / (HOT_R * HOT_R);
+                    const T   = T_BG + (T_HOT - T_BG) * wgt;
+                    pAccept   = Math.exp(-dE / T);
+                  } else {
+                    pAccept = expBg[dE];
+                  }
+                } else {
+                  pAccept = expBg[dE];
+                }
+                accept = Math.random() < pAccept;
+              }
+              if (accept) setAt(i, j, -s);
+            }
+          };
+
+          const draw = () => {
+            stepMetropolis(STEPS_PER_FRAME);
+            const w = canvas.clientWidth, h = canvas.clientHeight;
+            ctx.clearRect(0, 0, w, h);
+
+            // Hairline border at the canvas edge.
+            ctx.strokeStyle = 'rgba(26, 26, 23, 0.18)';
+            ctx.lineWidth = 1;
+            ctx.strokeRect(0.5, 0.5, w - 1, h - 1);
+
+            // Render up-spins as ink dots, alpha 0.62 (calm halftone).
+            const dotR = Math.min(cellW, cellH) * 0.42;
+            ctx.fillStyle = 'rgba(26, 26, 23, 0.62)';
+            for (let i = 0; i < Nw; i++) {
+              for (let j = 0; j < Nh; j++) {
+                if (spins[i * Nh + j] !== 1) continue;
+                const x = (i + 0.5) * cellW;
+                const y = (j + 0.5) * cellH;
+                ctx.beginPath();
+                ctx.arc(x, y, dotR, 0, Math.PI * 2);
+                ctx.fill();
+              }
+            }
+
+            raf = requestAnimationFrame(draw);
+          };
+          draw();
+
+          return () => {
+            cancelAnimationFrame(raf);
+            window.removeEventListener('resize',    resize);
+            canvas.removeEventListener('mousemove',  onMove);
+            canvas.removeEventListener('mouseleave', onLeave);
+          };
+        }, []);
+
+        return (
+          <canvas
+            ref={canvasRef}
+            aria-hidden="true"
+            style={{
+              display: 'block',
+              width: '100%',
+              aspectRatio: '16 / 7',
+              marginTop: '24px',
+            }}
+          />
+        );
+      };
+
+
+      // ── COMPONENTS ──────────────────────────────────────────────────────────────
+
+      const Rail = ({ page, setPage }) => (
+        <aside className="rail">
+          <a className="brand" href="#" onClick={(e) => { e.preventDefault(); setPage('home'); }}>
+            <img className="brand-logo" src="logos/syrg-logo.png" alt="SYRG" />
+            <span className="brand-title">Sinha-Yalageri<br/>Research Group</span>
+          </a>
+          <nav>
+            {NAV.map(([id, label]) => (
+              <button
+                key={id}
+                onClick={() => setPage(id)}
+                aria-current={page === id ? 'page' : undefined}
+              >
+                {label}
+              </button>
+            ))}
+          </nav>
+          <div className="rail-foot">
+            <div className="socials">
+              <SocialIcon kind="GitHub"    href={CONTACT.github} />
+              <SocialIcon kind="LinkedIn"  href={CONTACT.linkedin} />
+              <SocialIcon kind="YouTube"   href={CONTACT.youtube} />
+              <SocialIcon kind="Instagram" href={CONTACT.instagram} />
+            </div>
+            <div className="copy">© 2026 Sinha-Yalageri Research Group LLC. All Rights Reserved</div>
+          </div>
+        </aside>
+      );
+
+      const PaperItem = ({ p, first }) => {
+        const primaryHref = p.paper || p.code || p.notebook || '#';
+        const hasLinks    = p.paper || p.code || p.notebook;
+        const ts = tagsOf(p);
+        return (
+          <article className={"item" + (first ? " first" : "")}>
+            <div className="item-head">
+              <a className="title" href={primaryHref}>{p.title}</a>
+              {ts.length > 0 && (
+                <span className="tags">
+                  {ts.map(t => (
+                    <span key={t} className={"tag tag-" + t}>{TAG_LABELS[t] || t}</span>
+                  ))}
+                </span>
+              )}
+            </div>
+            {p.desc && <p className="blurb">{p.desc}</p>}
+            {hasLinks && (
+              <div className="links">
+                {p.paper    && <a href={p.paper}>[Paper]</a>}
+                {p.code     && <a href={p.code}>[Code]</a>}
+                {p.notebook && <a href={p.notebook}>[Notebook]</a>}
+              </div>
+            )}
+          </article>
+        );
+      };
+
+
+      // ── PAGES ───────────────────────────────────────────────────────────────────
+
+      const Home = ({ setPage }) => {
+        const goto = (p) => (e) => { e.preventDefault(); setPage(p); };
+        return (
+          <>
+            <h1 className="hero-title">Machine Learning for<br/>Scientific Discovery</h1>
+            <p className="lede">SYRG Labs (Sinha-Yalageri Research Group) develops scientific computing methods across economics, physics, and biology to advance data-driven scientific discovery.</p>
+            <IsingField />
+
+            <h2>Recent</h2>
+            {PAPERS.filter(p => !tagsOf(p).includes('reports')).slice(0, 3).map((p, i) =>
+              <PaperItem key={p.id} p={p} first={i === 0} />
+            )}
+            <p className="small" style={{ marginTop: 16 }}>
+              <a href="#research" onClick={goto('research')}>See all research →</a>
+            </p>
+          </>
+        );
+      };
+
+      // Research has 5 sub-tabs: Selected + one per tag. Reports is just
+      // another tag — entries with tag "reports" in the papers array show
+      // up under the Reports tab. Same data source, same renderer.
+      const Research = () => {
+        const [tab, setTab] = useState('selected');
+        const tabs = [
+          { id: 'selected', label: 'Selected' },
+          { id: 'social',   label: 'Social Science' },
+          { id: 'physics',  label: 'Physics' },
+          { id: 'bio',      label: 'Biology' },
+          { id: 'reports',  label: 'Reports' },
+        ];
+
+        const items = tab === 'selected'
+          ? SELECTED_IDS.map(id => PAPERS.find(p => p.id === id)).filter(Boolean)
+          : PAPERS.filter(p => tagsOf(p).includes(tab));
+
+        return (
+          <>
+            <h1>Research</h1>
+            <p className="muted">Methods, models, and code from the group.</p>
+            <div className="subnav">
+              {tabs.map(t => (
+                <button
+                  key={t.id}
+                  onClick={() => setTab(t.id)}
+                  aria-current={tab === t.id ? 'page' : undefined}
+                >
+                  {t.label}
+                </button>
+              ))}
+            </div>
+            {items.length === 0
+              ? <p className="muted" style={{ marginTop: 24 }}>Forthcoming.</p>
+              : items.map((p, i) => <PaperItem key={p.id} p={p} first={i === 0} />)}
+          </>
+        );
+      };
+
+      // Team page — Founding Team (LEADERSHIP) at the top, then a deduped flat list
+      // of everyone else from per-lab arrays in TEAM. Names with a `linkedin`
+      // field render as clickable LinkedIn links.
+      const Team = () => {
+        const leadNames = new Set(LEADERSHIP.map(l => l.name));
+        const seen = new Set();
+        const general = [];
+        for (const group of TEAM) {
+          for (const m of group.members) {
+            if (leadNames.has(m.name) || seen.has(m.name)) continue;
+            seen.add(m.name);
+            general.push(m);
+          }
+        }
+
+        const Name = ({ m }) => m.linkedin
+          ? <a className="member-name" href={m.linkedin} target="_blank" rel="noreferrer">{m.name}</a>
+          : <span className="member-name">{m.name}</span>;
+
+        return (
+          <>
+            <h1>Team</h1>
+            <p className="muted">The people behind the work.</p>
+
+            <h2>Founding Team</h2>
+            <ul className="roster">
+              {LEADERSHIP.map((m, i) => (
+                <li key={'lead-' + i}>
+                  <Name m={m} />
+                  <span className="aff">{m.role}</span>
+                </li>
+              ))}
+            </ul>
+
+            <h2>General Team</h2>
+            <ul className="roster">
+              {general.map((m, i) => {
+                const ext = m.affiliation && m.affiliation !== HOME_AFFIL ? m.affiliation : null;
+                return (
+                  <li key={'gen-' + i}>
+                    <Name m={m} />
+                    <span className="aff">{m.role}{ext ? ` · ${ext}` : ''}</span>
+                  </li>
+                );
+              })}
+            </ul>
+          </>
+        );
+      };
+
+      const Partners = () => {
+        const PartnerCard = ({ p }) => {
+          const inner = (
+            <>
+              <div className="logo-frame">
+                {p.logo
+                  ? <img src={p.logo} alt={p.name + ' logo'} />
+                  : <span className={p.name === "AIYGO" ? "wordmark-aiygo" : "wordmark-text"}>{p.name}</span>}
+              </div>
+              <span className="partner-name">{p.name}</span>
+              <span className="partner-role">{p.role}</span>
+            </>
+          );
+          return p.url
+            ? <a key={p.name} className="partner-card" href={p.url} target="_blank" rel="noreferrer">{inner}</a>
+            : <div key={p.name} className="partner-card">{inner}</div>;
+        };
+
+        const renderSponsorBody = (sp, label) => {
+          if (!sp)         return "—";
+          if (sp.logo)     return <img className="tier-logo" src={sp.logo} alt={sp.alt || label} />;
+          if (sp.name)     return <span className="wordmark-text">{sp.name}</span>;
+          return "—";
+        };
+
+        return (
+          <>
+            <h1>Partners</h1>
+            <p className="muted">We collaborate closely with research labs and are grateful for the support of our sponsors.</p>
+
+            <h2>Research Partners</h2>
+            <div>{RESEARCH_PARTNERS.map((p) => <PartnerCard key={p.name} p={p} />)}</div>
+
+            <h2>Sponsors</h2>
+            <div>
+              {["platinum", "gold", "silver", "bronze"].map((t) => {
+                const sp    = SPONSORS[t];
+                const label = t.charAt(0).toUpperCase() + t.slice(1);
+                const body  = renderSponsorBody(sp, label);
+                return (
+                  <div key={t} className="tier">
+                    <div className="tlabel">{label}</div>
+                    <div className={"tnames" + (!sp ? " tempty" : "")}>
+                      {sp && sp.url
+                        ? <a href={sp.url} target="_blank" rel="noreferrer">{body}</a>
+                        : body}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+            <p className="muted small" style={{ marginTop: 16 }}>Further partners to be announced.</p>
+
+            {ACADEMIC_COLLABS && ACADEMIC_COLLABS.length > 0 && (
+              <p className="muted small" style={{ marginTop: 28 }}>
+                <span style={{ fontWeight: 600, color: 'var(--ink)' }}>With Collaborators From: </span>
+                {ACADEMIC_COLLABS.slice(0, -1).join(", ")}
+                {ACADEMIC_COLLABS.length > 1 ? ", and " : ""}
+                {ACADEMIC_COLLABS[ACADEMIC_COLLABS.length - 1]}.
+              </p>
+            )}
+          </>
+        );
+      };
+
+      const ModelsData = () => (
+        <>
+          <h1>Models &amp; Data</h1>
+          <p className="muted">Interactive notebooks accompanying our research.</p>
+          {NOTEBOOKS.length === 0 ? (
+            <p className="muted" style={{ marginTop: 24 }}>Forthcoming.</p>
+          ) : (
+            <ul className="notebook-list">
+              {NOTEBOOKS.map(n => (
+                <li key={n.id}>
+                  <a className="notebook-link"
+                     href={n.url}
+                     target="_blank"
+                     rel="noreferrer">
+                    <div>
+                      <div className="notebook-title">{n.title}</div>
+                      {n.desc && <div className="notebook-desc">{n.desc}</div>}
+                    </div>
+                    <span className="notebook-arrow">→</span>
+                  </a>
+                </li>
+              ))}
+            </ul>
+          )}
+        </>
+      );
+
+      const News = () => {
+        const [tab, setTab] = useState('announcement');
+        const tabs = [
+          { id: 'announcement', label: 'Announcements' },
+          { id: 'press',        label: 'Press' },
+        ];
+        const items = NEWS.filter(n => n.tag === tab);
+
+        return (
+          <>
+            <h1>News</h1>
+            <p className="muted">Partnerships, sponsors, and milestones from the group.</p>
+
+            <div className="subnav">
+              {tabs.map(t => (
+                <button
+                  key={t.id}
+                  onClick={() => setTab(t.id)}
+                  aria-current={tab === t.id ? 'page' : undefined}
+                >
+                  {t.label}
+                </button>
+              ))}
+            </div>
+
+            {items.length === 0
+              ? <p className="muted" style={{ marginTop: 24 }}>Forthcoming.</p>
+              : items.map((n, i) => (
+                  <article key={i} className="news-item">
+                    {n.image && (
+                      <div className={"news-image" + (n.noBg ? " no-bg" : "")}>
+                        <img src={n.image} alt="" />
+                      </div>
+                    )}
+                    <div className="news-content">
+                      <div className="news-date">{n.date}</div>
+                      <h3 className="news-title">{n.title}</h3>
+                      <p className="news-body"><Linkify text={n.body} /></p>
+                    </div>
+                  </article>
+                ))}
+          </>
+        );
+      };
+
+
+      // ── APP / ROUTING ───────────────────────────────────────────────────────────
+      // Hash-based SPA: #research, #team, etc. Empty hash = home.
+
+      const pageFromHash = () => {
+        const h = (window.location.hash || '').replace('#', '');
+        return NAV.some(([id]) => id === h) ? h : 'home';
+      };
+
+      const PAGES = {
+        home:     Home,
+        research: Research,
+        team:     Team,
+        models:   ModelsData,
+        partners: Partners,
+        news:     News,
+      };
+
+      const App = () => {
+        const [page, _setPage] = useState(pageFromHash());
+        const setPage = (p) => {
+          _setPage(p);
+          window.location.hash = p === 'home' ? '' : p;
+          window.scrollTo({ top: 0, behavior: 'instant' });
+        };
+        useEffect(() => {
+          const onHash = () => _setPage(pageFromHash());
+          window.addEventListener('hashchange', onHash);
+          return () => window.removeEventListener('hashchange', onHash);
+        }, []);
+
+        const Page = PAGES[page] || Home;
+        return (
+          <div className="shell">
+            <Rail page={page} setPage={setPage} />
+            <main><Page setPage={setPage} /></main>
+          </div>
+        );
+      };
+
+      ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+    </script>
+  </body>
+</html>
