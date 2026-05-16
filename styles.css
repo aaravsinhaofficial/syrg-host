@@ -19,15 +19,15 @@
 
 /* 1. Tokens ----------------------------------------------------------------- */
 :root {
-  --bg:     #111814;   /* page background, graphite green */
-  --ink:    #e2ebe4;   /* primary text */
-  --muted:  #a6b5ac;   /* secondary text */
-  --rule:   #2b3831;   /* hairline dividers */
-  --soft:   #708077;   /* tertiary text */
-  --link:   #e2ebe4;
-  --accent: #c6a66a;   /* muted clay-gold accent */
-  --field:  #17211c;   /* neural field wash */
-  --field-ink: 226, 235, 228;
+  --bg:     #eaf4fb;   /* page background, quiet light blue */
+  --ink:    #162330;   /* primary text */
+  --muted:  #5f7282;   /* secondary text */
+  --rule:   #c8ddea;   /* hairline dividers */
+  --soft:   #8aa0ae;   /* tertiary text */
+  --link:   #162330;
+  --accent: #356f96;   /* muted lake-blue accent */
+  --field:  #dbeaf4;   /* neural field wash */
+  --field-ink: 22, 35, 48;
 }
 
 
@@ -117,7 +117,6 @@ aside.rail .brand-logo {
   width: auto;
   display: block;
   flex-shrink: 0;
-  filter: invert(1) brightness(0.96) sepia(0.08);
   transition: opacity 200ms ease;
 }
 aside.rail .brand:hover .brand-logo { opacity: 0.75; }
@@ -350,10 +349,10 @@ aside.rail .socials svg {
   transition: opacity 200ms ease;
 }
 .item:hover .tag { opacity: 1; }
-.tag-physics { color: #7b6428; }
+.tag-physics { color: #4b7190; }
 .tag-social  { color: var(--accent); }
-.tag-bio     { color: #405f48; }
-.tag-reports { color: #3f5664; }
+.tag-bio     { color: #356f76; }
+.tag-reports { color: #496778; }
 
 
 /* 7b. News items ------------------------------------------------------------ */
@@ -516,23 +515,6 @@ aside.rail .socials svg {
   justify-content: space-between;
   gap: 16px;
 }
-.bio {
-  margin: 10px 0 0;
-  color: var(--ink);
-  font-size: 15px;
-  line-height: 1.62;
-}
-.interests {
-  margin: 10px 0 0;
-  color: var(--muted);
-  font-size: 14px;
-  line-height: 1.55;
-}
-.interests span {
-  color: var(--ink);
-  font-weight: 600;
-}
-
 
 /* 9. Tier (Sponsor rows) ---------------------------------------------------- */
 .tier {
