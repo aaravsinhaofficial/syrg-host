@@ -19,13 +19,15 @@
 
 /* 1. Tokens ----------------------------------------------------------------- */
 :root {
-  --bg:     #f6f3ec;   /* page background, warm cream */
-  --ink:    #1a1a17;   /* primary text */
-  --muted:  #6b6b66;   /* secondary text */
-  --rule:   #e2dfd8;   /* hairline dividers */
-  --soft:   #c8c4b8;   /* tertiary text */
-  --link:   #1a1a17;
-  --accent: #8a3b1f;   /* warm-brown accent for hover and active */
+  --bg:     #e8eee7;   /* page background, quiet sage */
+  --ink:    #17201b;   /* primary text */
+  --muted:  #5b6760;   /* secondary text */
+  --rule:   #cbd5cc;   /* hairline dividers */
+  --soft:   #96a198;   /* tertiary text */
+  --link:   #17201b;
+  --accent: #6c4b35;   /* clay accent for hover and active */
+  --field:  #dfe7df;   /* neural field wash */
+  --field-ink: 23, 32, 27;
 }
 
 
@@ -172,7 +174,7 @@ aside.rail .rail-foot {
 }
 aside.rail .rail-foot .copy {
   font-size: 11.5px;
-  color: #9a9789;
+  color: var(--soft);
   line-height: 1.5;
   max-width: 220px;
 }
@@ -221,9 +223,6 @@ aside.rail .socials svg {
   display: block;
   width: 100%;
   height: 100%;
-  /* Vignette mask: fade edges so text in the sidebar / corners stays clean */
-  -webkit-mask-image: radial-gradient(ellipse 110% 90% at 50% 50%, #000 30%, rgba(0,0,0,0.55) 75%, transparent 100%);
-          mask-image: radial-gradient(ellipse 110% 90% at 50% 50%, #000 30%, rgba(0,0,0,0.55) 75%, transparent 100%);
 }
 /* PIML equation pinned to the bottom-right of the viewport */
 .hero-anim-eqn {
@@ -321,7 +320,7 @@ aside.rail .socials svg {
 }
 .item .blurb {
   margin: 6px 0 0;
-  color: #3a3a37;
+  color: var(--ink);
   font-size: 14.5px;
   line-height: 1.5;
 }
@@ -350,10 +349,10 @@ aside.rail .socials svg {
   transition: opacity 200ms ease;
 }
 .item:hover .tag { opacity: 1; }
-.tag-physics { color: #a07a1f; }
-.tag-social  { color: #8a3b1f; }
-.tag-bio     { color: #4d6b32; }
-.tag-reports { color: #3d5266; }
+.tag-physics { color: #7b6428; }
+.tag-social  { color: var(--accent); }
+.tag-bio     { color: #405f48; }
+.tag-reports { color: #3f5664; }
 
 
 /* 7b. News items ------------------------------------------------------------ */
@@ -369,7 +368,7 @@ aside.rail .socials svg {
 .news-image {
   width: 120px;
   height: 120px;
-  background: #efece4;
+  background: var(--field);
   border-radius: 4px;
   overflow: hidden;
   flex-shrink: 0;
@@ -405,7 +404,7 @@ aside.rail .socials svg {
 }
 .news-body {
   margin: 0;
-  color: #3a3a37;
+  color: var(--ink);
   line-height: 1.55;
   font-size: 15px;
 }
@@ -506,6 +505,32 @@ aside.rail .socials svg {
   text-decoration-color: var(--accent);
   text-underline-offset: 3px;
 }
+.roster li.person {
+  display: block;
+  padding: 18px 0 22px;
+}
+.person-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+}
+.bio {
+  margin: 10px 0 0;
+  color: var(--ink);
+  font-size: 15px;
+  line-height: 1.62;
+}
+.interests {
+  margin: 10px 0 0;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.55;
+}
+.interests span {
+  color: var(--ink);
+  font-weight: 600;
+}
 
 
 /* 9. Tier (Sponsor rows) ---------------------------------------------------- */
@@ -604,6 +629,13 @@ a.partner-card:hover { color: var(--accent); }
   aside.rail .rail-foot { display: none; }
   h1 { font-size: 26px; }
   .lede { font-size: 18px; }
+  .person-head {
+    display: block;
+  }
+  .person-head .aff {
+    display: block;
+    margin-top: 2px;
+  }
   .partner-card { grid-template-columns: 110px 1fr; row-gap: 4px; }
   .partner-card .partner-role { grid-column: 2; }
 }
