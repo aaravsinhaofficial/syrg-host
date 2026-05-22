@@ -14,6 +14,7 @@ window.SYRG_DATA = {
       name: "Aarav Sinha",
       role: "Co-founder",
       linkedin: "https://www.linkedin.com/in/aaravsinha1/",
+      orcid: "0009-0001-8238-9309",
     },
     {
       name: "Mrinal Yalageri",
@@ -24,6 +25,7 @@ window.SYRG_DATA = {
       name: "Angad Kumar",
       role: "Research Director",
       linkedin: "https://www.linkedin.com/in/angad-kumarcs/",
+      orcid: "0009-0003-5253-3335",
     },
   ],
 

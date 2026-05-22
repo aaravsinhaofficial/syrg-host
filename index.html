@@ -613,9 +613,23 @@
           general.push(m);
         }
 
-        const Name = ({ m }) => m.linkedin
-          ? <a className="member-name" href={m.linkedin} target="_blank" rel="noreferrer">{m.name}</a>
-          : <span className="member-name">{m.name}</span>;
+        const Name = ({ m }) => {
+          const nameNode = m.linkedin
+            ? <a className="member-name" href={m.linkedin} target="_blank" rel="noreferrer">{m.name}</a>
+            : <span className="member-name">{m.name}</span>;
+
+          if (m.orcid) {
+            const orcidHref = `https://orcid.org/${m.orcid}`;
+            return (
+              <span className="name-with-orcid">
+                {nameNode}
+                <a className="orcid" href={orcidHref} target="_blank" rel="noreferrer"> · ORCID {m.orcid}</a>
+              </span>
+            );
+          }
+
+          return nameNode;
+        };
 
         return (
           <>
