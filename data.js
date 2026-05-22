@@ -28,6 +28,21 @@ window.SYRG_DATA = {
       role: "Modeling Research Direction",
       linkedin: "https://www.linkedin.com/in/angad-kumarcs/",
     },
+    {
+      name: "Samanyu Pochanapeddi",
+      role: "Technical Staff",
+      linkedin: "https://www.linkedin.com/in/samanyu-pochanapeddi-1bb3242a8/",
+    },
+    {
+      name: "Aadi Dhagat",
+      role: "Technical Staff",
+      linkedin: "https://www.google.com",
+    },
+    {
+      name: "Noah Abuja",
+      role: "Researcher",
+      linkedin: "https://www.google.com",
+    },
   ],
 
   researchPartners: [],
