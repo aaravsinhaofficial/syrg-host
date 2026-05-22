@@ -20,14 +20,14 @@ window.SYRG_DATA = {
       role: "Co-founder",
       linkedin: "https://www.linkedin.com/in/mrinal-yalageri-769967368/",
     },
+    {
+      name: "Angad Kumar",
+      role: "Modeling Research Director",
+      linkedin: "https://www.linkedin.com/in/angad-kumarcs/",
+    },
   ],
 
   team: [
-    {
-      name: "Angad Kumar",
-      role: "Modeling Research Direction",
-      linkedin: "https://www.linkedin.com/in/angad-kumarcs/",
-    },
     {
       name: "Samanyu Pochanapeddi",
       role: "Technical Staff",
