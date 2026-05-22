@@ -12,7 +12,7 @@ window.SYRG_DATA = {
   leadership: [
     {
       name: "Aarav Sinha",
-      role: "Co-founder",
+      role: "Lead Researcher",
       linkedin: "https://www.linkedin.com/in/aaravsinha1/",
     },
     {
@@ -22,7 +22,13 @@ window.SYRG_DATA = {
     },
   ],
 
-  team: [],
+  team: [
+    {
+      name: "Angad Kumar",
+      role: "Modeling Research Direction",
+      linkedin: "https://www.linkedin.com/in/angad-kumarcs/",
+    },
+  ],
 
   researchPartners: [],
 
