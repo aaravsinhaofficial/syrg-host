@@ -43,6 +43,14 @@ window.SYRG_DATA = {
       role: "Researcher",
       linkedin: "https://www.google.com",
     },
+    {
+      name: "Karanveer Singh",
+      role: "Researcher",
+    },
+    {
+      name: "Nirjhar Chakrabarty",
+      role: "Researcher",
+    },
   ],
 
   researchPartners: [],
