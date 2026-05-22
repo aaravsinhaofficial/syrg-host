@@ -12,7 +12,7 @@ window.SYRG_DATA = {
   leadership: [
     {
       name: "Aarav Sinha",
-      role: "Lead Researcher",
+      role: "Lead Researcher and Co-founder",
       linkedin: "https://www.linkedin.com/in/aaravsinha1/",
     },
     {
