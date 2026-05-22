@@ -601,18 +601,16 @@
       };
 
       // Team page — Founding Team (LEADERSHIP) at the top, then a deduped flat list
-      // of everyone else from per-lab arrays in TEAM. Names with a `linkedin`
+      // of everyone else from TEAM. Names with a `linkedin`
       // field render as clickable LinkedIn links.
       const Team = () => {
         const leadNames = new Set(LEADERSHIP.map(l => l.name));
         const seen = new Set();
         const general = [];
-        for (const group of TEAM) {
-          for (const m of group.members) {
-            if (leadNames.has(m.name) || seen.has(m.name)) continue;
-            seen.add(m.name);
-            general.push(m);
-          }
+        for (const m of TEAM) {
+          if (leadNames.has(m.name) || seen.has(m.name)) continue;
+          seen.add(m.name);
+          general.push(m);
         }
 
         const Name = ({ m }) => m.linkedin
