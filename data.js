@@ -33,7 +33,7 @@ window.SYRG_DATA = {
     {
       name: "Noah Abuja",
       role: "Technical Staff",
-      linkedin: "https://www.google.com",
+      linkedin: "https://www.linkedin.com/in/noah-ahuja-2a10033ba/",
     },
     {
       name: "Samanyu Pochanapeddi",
