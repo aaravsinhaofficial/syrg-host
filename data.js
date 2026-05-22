@@ -31,7 +31,7 @@ window.SYRG_DATA = {
     {
       name: "Noah Abuja",
       role: "Technical Staff",
-      linkedin: "https://www.google.com",
+      //linkedin: "https://www.linkedin.com/in/mrinal-yalageri-769967368/",
     },
     {
       name: "Samanyu Pochanapeddi",
@@ -41,7 +41,7 @@ window.SYRG_DATA = {
     {
       name: "Aadi Dhagat",
       role: "Technical Staff",
-      linkedin: "https://www.google.com",
+      //linkedin: "https://www.linkedin.com/in/mrinal-yalageri-769967368/",
     },
   ],
 
