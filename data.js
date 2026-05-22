@@ -20,30 +20,9 @@ window.SYRG_DATA = {
       role: "Co-founder",
       linkedin: "https://www.linkedin.com/in/mrinal-yalageri-769967368/",
     },
-    {
-      name: "Angad Kumar",
-      role: "Research Director",
-      linkedin: "https://www.linkedin.com/in/angad-kumarcs/",
-    },
   ],
 
-  team: [
-    {
-      name: "Noah Abuja",
-      role: "Technical Staff",
-      //linkedin: "https://www.linkedin.com/in/mrinal-yalageri-769967368/",
-    },
-    {
-      name: "Samanyu Pochanapeddi",
-      role: "Technical Staff",
-      linkedin: "https://www.linkedin.com/in/samanyu-pochanapeddi-1bb3242a8/",
-    },
-    {
-      name: "Aadi Dhagat",
-      role: "Technical Staff",
-      //linkedin: "https://www.linkedin.com/in/mrinal-yalageri-769967368/",
-    },
-  ],
+  team: [],
 
   researchPartners: [],
 
