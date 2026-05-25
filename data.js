@@ -14,6 +14,7 @@ window.SYRG_DATA = {
       venue: "ICML 2026 Workshop GenBio · Accepted Poster",
       desc: "A digital-fly benchmark for testing whether AI scientist agents can iteratively uncover neural mechanisms through budgeted interventions, memory, and held-out counterfactual prediction.",
       paper: "papers/can-ai-scientists-discover-neural-mechanisms.pdf",
+      openreview: "https://openreview.net/pdf?id=yyEEwEAa5a",
     },
   ],
 
