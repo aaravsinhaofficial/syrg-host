@@ -5,9 +5,19 @@
  */
 
 window.SYRG_DATA = {
-  papers: [],
+  papers: [
+    {
+      id: "digital-fly-ai-scientists",
+      tag: "bio",
+      title: "Can AI Scientists Discover Neural Mechanisms? Evaluating Agentic Biological Discovery in a Digital Fly.",
+      author: "Aarav Sinha",
+      venue: "ICML 2026 Workshop GenBio · Accepted Poster",
+      desc: "A digital-fly benchmark for testing whether AI scientist agents can iteratively uncover neural mechanisms through budgeted interventions, memory, and held-out counterfactual prediction.",
+      paper: "papers/can-ai-scientists-discover-neural-mechanisms.pdf",
+    },
+  ],
 
-  selected: [],
+  selected: ["digital-fly-ai-scientists"],
 
   leadership: [
     {

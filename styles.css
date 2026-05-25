@@ -318,6 +318,15 @@ aside.rail .socials svg {
   text-decoration: none;
   transition: color 200ms ease;
 }
+.item .byline {
+  margin: 5px 0 0;
+  color: var(--muted);
+  font-size: 13.5px;
+  line-height: 1.45;
+}
+.item .byline .dot {
+  color: var(--soft);
+}
 .item .blurb {
   margin: 6px 0 0;
   color: var(--ink);

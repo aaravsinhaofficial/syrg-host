@@ -13,8 +13,8 @@
       href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400..700;1,8..60,400..700&family=Cinzel:wght@500;600;700&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="styles.css?v=20260516-blue" />
-    <script src="data.js?v=20260516-blue"></script>
+    <link rel="stylesheet" href="styles.css?v=20260525-paper" />
+    <script src="data.js?v=20260525-paper"></script>
     <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" crossorigin="anonymous"></script>
     <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" crossorigin="anonymous"></script>
     <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" crossorigin="anonymous"></script>
@@ -378,6 +378,13 @@
                 </span>
               )}
             </div>
+            {(p.author || p.venue) && (
+              <p className="byline">
+                {p.author && <span>{p.author}</span>}
+                {p.author && p.venue && <span className="dot"> · </span>}
+                {p.venue && <span>{p.venue}</span>}
+              </p>
+            )}
             {p.desc && <p className="blurb">{p.desc}</p>}
             {hasLinks && (
               <div className="links">
@@ -426,7 +433,7 @@
         return (
           <>
             <h1>Research</h1>
-            <p className="muted">Research is in progress. We do not have papers to list yet.</p>
+            <p className="muted">Accepted papers and project artifacts from the group.</p>
             {PAPERS.length > 0 && (
               <div className="subnav">
                 {tabs.map(t => (
