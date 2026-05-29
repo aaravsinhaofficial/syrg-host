@@ -7,6 +7,16 @@
 window.SYRG_DATA = {
   papers: [
     {
+      id: "credit-bandwidth-cortical-learning",
+      tag: "bio",
+      title: "Credit Bandwidth Lower Bounds for Diffusive Cortical Learning",
+      author: "Aarav Sinha",
+      venue: "Research Square · Preprint",
+      desc: "A communication-constrained credit-assignment theory for cortical graphs, linking graph-spectral adjoint smoothness and feedback bandwidth to constrained-gradient error and learning floors.",
+      paper: "https://www.researchsquare.com/article/rs-9841779/v1",
+      doi: "https://doi.org/10.21203/rs.3.rs-9841779/v1",
+    },
+    {
       id: "digital-fly-ai-scientists",
       tag: "bio",
       title: "Can AI Scientists Discover Neural Mechanisms? Evaluating Agentic Biological Discovery in a Digital Fly.",
@@ -18,7 +28,7 @@ window.SYRG_DATA = {
     },
   ],
 
-  selected: ["digital-fly-ai-scientists"],
+  selected: ["credit-bandwidth-cortical-learning", "digital-fly-ai-scientists"],
 
   leadership: [
     {
