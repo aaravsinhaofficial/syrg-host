@@ -13,7 +13,8 @@ window.SYRG_DATA = {
       author: "Aarav Sinha",
       venue: "Research Square · Preprint",
       desc: "A communication-constrained credit-assignment theory for cortical graphs, linking graph-spectral adjoint smoothness and feedback bandwidth to constrained-gradient error and learning floors.",
-      paper: "v1_covered_da476414-bead-4dfd-abd6-3b6dde43422e.pdf",
+      paper: "https://www.researchsquare.com/article/rs-9841779/v1",
+      pdf: "credit-bandwidth-lower-bounds-for-diffusive-cortical-learning.pdf",
       doi: "https://doi.org/10.21203/rs.3.rs-9841779/v1",
     },
     {

@@ -14,7 +14,7 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="styles.css?v=20260525-openreview" />
-    <script src="data.js?v=20260529-credit-bandwidth-pdf"></script>
+    <script src="data.js?v=20260529-credit-bandwidth-links"></script>
     <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" crossorigin="anonymous"></script>
     <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" crossorigin="anonymous"></script>
     <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" crossorigin="anonymous"></script>
@@ -363,8 +363,8 @@
       );
 
       const PaperItem = ({ p, first }) => {
-        const primaryHref = p.doi || p.paper || p.openreview || p.code || p.notebook || '#';
-        const hasLinks    = p.paper || p.doi || p.openreview || p.code || p.notebook;
+        const primaryHref = p.doi || p.paper || p.pdf || p.openreview || p.code || p.notebook || '#';
+        const hasLinks    = p.paper || p.pdf || p.doi || p.openreview || p.code || p.notebook;
         const ts = tagsOf(p);
         return (
           <article className={"item" + (first ? " first" : "")}>
@@ -389,7 +389,8 @@
             {hasLinks && (
               <div className="links">
                 {p.paper    && <a href={p.paper}>[Paper]</a>}
-                {p.doi      && <a href={p.doi}>[DOI]</a>}
+                {p.pdf      && <a href={p.pdf}>[PDF]</a>}
+                {!p.paper && p.doi && <a href={p.doi}>[DOI]</a>}
                 {p.openreview && <a href={p.openreview}>[OpenReview]</a>}
                 {p.code     && <a href={p.code}>[Code]</a>}
                 {p.notebook && <a href={p.notebook}>[Notebook]</a>}
